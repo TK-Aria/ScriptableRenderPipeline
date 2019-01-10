@@ -11,6 +11,10 @@
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/NormalBuffer.hlsl"
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/VolumeRendering.hlsl"
 
+#ifdef DEBUG_DISPLAY
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Debug/DebugEditorViz.hlsl"
+#endif
+
 //-----------------------------------------------------------------------------
 // Configuration
 //-----------------------------------------------------------------------------
@@ -287,7 +291,7 @@ void ApplyDebugToSurfaceData(float3x3 worldToTangent, inout SurfaceData surfaceD
 }
 
 // This function is similar to ApplyDebugToSurfaceData but for BSDFData
-void ApplyDebugToBSDFData(inout BSDFData bsdfData)
+void ApplyDebugToBSDFData(inout BSDFData bsdfData, bool metallic, bool metallicWorkflow)
 {
 #ifdef DEBUG_DISPLAY
     // Override value if requested by user
@@ -298,6 +302,15 @@ void ApplyDebugToBSDFData(inout BSDFData bsdfData)
     {
         float3 overrideSpecularColor = _DebugLightingSpecularColor.yzw;
         bsdfData.fresnel0 = overrideSpecularColor;
+    }
+
+    if (_DebugLightingMode == DEBUGLIGHTINGMODE_VALIDATE_ALBEDO )
+    {
+        bsdfData.diffuseColor = pbrAlbedoValidate(bsdfData, metallic, metallicWorkflow).xyz;
+    }
+    else if (_DebugLightingMode == DEBUGLIGHTINGMODE_VALIDATE_METAL)
+    {
+        bsdfData.diffuseColor = pbrMetalValidate(bsdfData, metallic, metallicWorkflow).xyz;
     }
 #endif
 }
@@ -445,7 +458,8 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
         surfaceData.thickness, surfaceData.transmittanceMask, bsdfData);
 #endif
 
-    ApplyDebugToBSDFData(bsdfData);
+    //Pass information to bsdf debug to check if we are using metallic workflow or specular color workflow
+    ApplyDebugToBSDFData(bsdfData, surfaceData.metallic > 0.0, !HasFlag(surfaceData.materialFeatures, MATERIALFEATUREFLAGS_LIT_SPECULAR_COLOR));
 
     return bsdfData;
 }
@@ -732,9 +746,10 @@ uint DecodeFromGBuffer(uint2 positionSS, uint tileFeatureFlags, out BSDFData bsd
     // Decompress feature-specific data from the G-Buffer.
     bool pixelHasMetallic = HasFlag(pixelFeatureFlags, MATERIALFEATUREFLAGS_LIT_ANISOTROPY | MATERIALFEATUREFLAGS_LIT_IRIDESCENCE);
 
+    float metallic = 0.0;
+
     if (pixelHasMetallic)
     {
-        float metallic;
         uint unused;
         UnpackFloatInt8bit(inGBuffer2.b, 8, metallic, unused);
 
@@ -837,7 +852,11 @@ uint DecodeFromGBuffer(uint2 positionSS, uint tileFeatureFlags, out BSDFData bsd
     // perceptualRoughness can be modify by FillMaterialClearCoatData, so ConvertAnisotropyToClampRoughness must be call after
     ConvertAnisotropyToRoughness(bsdfData.perceptualRoughness, bsdfData.anisotropy, bsdfData.roughnessT, bsdfData.roughnessB);
 
-    ApplyDebugToBSDFData(bsdfData);
+    // Pass specular or metallic workflow infromation to debug bsdf it's needed for material validation
+    // When coming from g-buffer we don't know always know if the metallic value is in the g-buffer.
+    // on the c# code side we just force the rendering to forward to have perfect information about the material
+    // material validation shouldn't be run in g-buffer mode but variables are passed anyway for completeness 
+    ApplyDebugToBSDFData(bsdfData, metallic > 0.0, pixelHasMetallic);
 
     return pixelFeatureFlags;
 }

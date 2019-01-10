@@ -14,6 +14,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         VisualizeShadowMasks,
         IndirectDiffuseOcclusion,
         IndirectSpecularOcclusion,
+        ValidateAlbedo,
+        ValidateMetal
     }
 
     [GenerateHLSL]
@@ -64,7 +66,10 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
         public Color                overrideSpecularColorValue = new Color(1.0f, 1.0f, 1.0f);
         public bool                 overrideEmissiveColor = false;
         public Color                overrideEmissiveColorValue = new Color(1.0f, 1.0f, 1.0f);
-
+        public Color                materialValidateLowColor = new Color(1.0f, 0.0f, 0.0f);
+        public Color                materialValidateHighColor = new Color(0.0f, 0.0f, 1.0f);
+        public Color                materialValidateTrueMetalColor = new Color(1.0f, 1.0f, 0.0f);
+        public bool                 materialValidateTrueMetal = false;
 
         public bool                 displaySkyReflection = false;
         public float                skyReflectionMipmap = 0.0f;

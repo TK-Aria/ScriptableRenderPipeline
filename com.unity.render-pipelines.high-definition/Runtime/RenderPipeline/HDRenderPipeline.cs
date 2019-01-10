@@ -1162,8 +1162,8 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                     // TODO: Try to arrange code so we can trigger this call earlier and use async compute here to run sky convolution during other passes (once we move convolution shader to compute).
                     UpdateSkyEnvironment(hdCamera, cmd);
 
-
-                    if (m_CurrentDebugDisplaySettings.IsDebugMaterialDisplayEnabled())
+                    
+                    if (m_CurrentDebugDisplaySettings.IsDebugMaterialDisplayEnabled() || m_CurrentDebugDisplaySettings.IsMaterialValidationEnabled())
                     {
                         RenderDebugViewMaterial(cullingResults, hdCamera, renderContext, cmd);
 
@@ -2432,6 +2432,7 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 var debugNormal = new Vector4(lightingDebugSettings.overrideNormal ? 1.0f : 0.0f, 0.0f, 0.0f, 0.0f);
                 var debugSpecularColor = new Vector4(lightingDebugSettings.overrideSpecularColor ? 1.0f : 0.0f, lightingDebugSettings.overrideSpecularColorValue.r, lightingDebugSettings.overrideSpecularColorValue.g, lightingDebugSettings.overrideSpecularColorValue.b);
                 var debugEmissiveColor = new Vector4(lightingDebugSettings.overrideEmissiveColor ? 1.0f : 0.0f, lightingDebugSettings.overrideEmissiveColorValue.r, lightingDebugSettings.overrideEmissiveColorValue.g, lightingDebugSettings.overrideEmissiveColorValue.b);
+                var debugTrueMetalColor = new Vector4(lightingDebugSettings.materialValidateTrueMetal ? 1.0f : 0.0f, lightingDebugSettings.materialValidateTrueMetalColor.r, lightingDebugSettings.materialValidateTrueMetalColor.g, lightingDebugSettings.materialValidateTrueMetalColor.b);
 
                 cmd.SetGlobalInt(HDShaderIDs._DebugViewMaterial, (int)m_CurrentDebugDisplaySettings.GetDebugMaterialIndex());
                 cmd.SetGlobalInt(HDShaderIDs._DebugLightingMode, (int)m_CurrentDebugDisplaySettings.GetDebugLightingMode());
@@ -2445,6 +2446,9 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
                 cmd.SetGlobalVector(HDShaderIDs._DebugLightingNormal, debugNormal);
                 cmd.SetGlobalVector(HDShaderIDs._DebugLightingSpecularColor, debugSpecularColor);
                 cmd.SetGlobalVector(HDShaderIDs._DebugLightingEmissiveColor, debugEmissiveColor);
+                cmd.SetGlobalColor(HDShaderIDs._DebugLightingMaterialValidateHighColor, lightingDebugSettings.materialValidateHighColor);
+                cmd.SetGlobalColor(HDShaderIDs._DebugLightingMaterialValidateLowColor, lightingDebugSettings.materialValidateLowColor);
+                cmd.SetGlobalColor(HDShaderIDs._DebugLightingMaterialValidatePureMetalColor, debugTrueMetalColor);
 
                 cmd.SetGlobalVector(HDShaderIDs._MousePixelCoord, HDUtils.GetMouseCoordinates(hdCamera));
                 cmd.SetGlobalVector(HDShaderIDs._MouseClickPixelCoord, HDUtils.GetMouseClickCoordinates(hdCamera));

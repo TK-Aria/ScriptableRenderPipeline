@@ -55,6 +55,10 @@ void ApplyDebug(LightLoopContext lightLoopContext, float3 positionWS, inout floa
 
         }
     }
+    else if(_DebugLightingMode == DEBUGLIGHTINGMODE_VALIDATE_ALBEDO || _DebugLightingMode == DEBUGLIGHTINGMODE_VALIDATE_METAL)
+    {
+        specularLighting = float3(0.0, 0.0, 0.0);
+    }
 
     // We always apply exposure when in debug mode. The exposure value will be at a neutral 0.0 when not needed.
     diffuseLighting *= exp2(_DebugExposure);

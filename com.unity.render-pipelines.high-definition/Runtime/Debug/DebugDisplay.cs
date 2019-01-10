@@ -174,6 +174,11 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             return data.fullScreenDebugMode != FullScreenDebugMode.None;
         }
 
+        public bool IsMaterialValidationEnabled()
+        {
+            return (data.lightingDebugSettings.debugLightingMode == DebugLightingMode.ValidateAlbedo) || (data.lightingDebugSettings.debugLightingMode == DebugLightingMode.ValidateMetal);
+        }
+
         public bool IsDebugMipMapDisplayEnabled()
         {
             return data.mipMapDebugSettings.IsDebugDisplayEnabled();
@@ -380,6 +385,21 @@ namespace UnityEngine.Experimental.Rendering.HDPipeline
             list.Add(new DebugUI.FloatField { displayName = "Shadow Range Max Value", getter = () => data.lightingDebugSettings.shadowMaxValue, setter = value => data.lightingDebugSettings.shadowMaxValue = value });
 
             list.Add(new DebugUI.EnumField { displayName = "Lighting Debug Mode", getter = () => (int)data.lightingDebugSettings.debugLightingMode, setter = value => SetDebugLightingMode((DebugLightingMode)value), autoEnum = typeof(DebugLightingMode), onValueChanged = RefreshLightingDebug, getIndex = () => data.lightingDebugModeEnumIndex, setIndex = value => data.lightingDebugModeEnumIndex = value });
+
+            if (data.lightingDebugSettings.debugLightingMode == DebugLightingMode.ValidateAlbedo || data.lightingDebugSettings.debugLightingMode == DebugLightingMode.ValidateMetal )
+            {
+                list.Add(new DebugUI.Container
+                {
+                    children =
+                    {
+                        new DebugUI.ColorField { displayName = "Validated Value Too High Color", getter = () => data.lightingDebugSettings.materialValidateHighColor, setter = value => data.lightingDebugSettings.materialValidateHighColor = value, showAlpha = false, hdr = true },
+                        new DebugUI.ColorField { displayName = "Validated Value Too Low Color", getter = () => data.lightingDebugSettings.materialValidateLowColor, setter = value => data.lightingDebugSettings.materialValidateLowColor = value, showAlpha = false, hdr = true },
+                        new DebugUI.ColorField { displayName = "Validated Value Not True Metal Color", getter = () => data.lightingDebugSettings.materialValidateTrueMetalColor, setter = value => data.lightingDebugSettings.materialValidateTrueMetalColor = value, showAlpha = false, hdr = true },
+                        new DebugUI.BoolField  { displayName = "Validate True Metals", getter = () => data.lightingDebugSettings.materialValidateTrueMetal, setter = (v) => data.lightingDebugSettings.materialValidateTrueMetal = v },
+                    }
+                });
+            }
+
             list.Add(new DebugUI.EnumField { displayName = "Fullscreen Debug Mode", getter = () => (int)data.fullScreenDebugMode, setter = value => SetFullScreenDebugMode((FullScreenDebugMode)value), enumNames = s_LightingFullScreenDebugStrings, enumValues = s_LightingFullScreenDebugValues, onValueChanged = RefreshLightingDebug, getIndex = () => data.lightingFulscreenDebugModeEnumIndex, setIndex = value => data.lightingFulscreenDebugModeEnumIndex = value });
             switch (data.fullScreenDebugMode)
             {

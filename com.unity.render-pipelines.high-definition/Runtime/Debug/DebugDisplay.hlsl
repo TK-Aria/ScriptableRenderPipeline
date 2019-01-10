@@ -23,6 +23,9 @@ float4 _DebugLightingSmoothness; // x == bool override, y == override value
 float4 _DebugLightingNormal; // x == bool override
 float4 _DebugLightingSpecularColor; // x == bool override, yzw = specular color
 float4 _DebugLightingEmissiveColor; // x == bool override, yzw = emissive color
+float4 _DebugLightingMaterialValidateHighColor; // user can specific the colors for the validator error conditions
+float4 _DebugLightingMaterialValidateLowColor;
+float4 _DebugLightingMaterialValidatePureMetalColor;
 float4 _MousePixelCoord;  // xy unorm, zw norm
 float4 _MouseClickPixelCoord;  // xy unorm, zw norm
 float _DebugExposure;

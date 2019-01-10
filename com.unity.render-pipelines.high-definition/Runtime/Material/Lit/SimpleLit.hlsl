@@ -14,6 +14,10 @@
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/NormalBuffer.hlsl"
 #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/VolumeRendering.hlsl"
 
+#ifdef DEBUG_DISPLAY
+#include "Packages/com.unity.render-pipelines.high-definition/Runtime/Debug/DebugEditorViz.hlsl"
+#endif
+
 #define USE_DIFFUSE_LAMBERT_BRDF
 
 void ClampRoughness(inout BSDFData bsdfData, float minRoughness)
@@ -44,7 +48,7 @@ float3 GetNormalForShadowBias(BSDFData bsdfData)
 }
 
 // This function is similar to ApplyDebugToSurfaceData but for BSDFData
-void ApplyDebugToBSDFData(inout BSDFData bsdfData)
+void ApplyDebugToBSDFData(inout BSDFData bsdfData, bool metallic, bool metallicWorkflow)
 {
 #ifdef DEBUG_DISPLAY
     // Override value if requested by user
@@ -55,6 +59,15 @@ void ApplyDebugToBSDFData(inout BSDFData bsdfData)
     {
         float3 overrideSpecularColor = _DebugLightingSpecularColor.yzw;
         bsdfData.fresnel0 = overrideSpecularColor;
+    }
+
+    if (_DebugLightingMode == DEBUGLIGHTINGMODE_VALIDATE_ALBEDO )
+    {
+        bsdfData.diffuseColor = pbrAlbedoValidate(bsdfData, metallic, metallicWorkflow).xyz;
+    }
+    else if (_DebugLightingMode == DEBUGLIGHTINGMODE_VALIDATE_METAL)
+    {
+        bsdfData.diffuseColor = pbrMetalValidate(bsdfData, metallic, metallicWorkflow).xyz;
     }
 #endif
 }
@@ -120,7 +133,7 @@ BSDFData ConvertSurfaceDataToBSDFData(uint2 positionSS, SurfaceData surfaceData)
         surfaceData.thickness, surfaceData.transmittanceMask, bsdfData);
 #endif
 
-    ApplyDebugToBSDFData(bsdfData);
+    ApplyDebugToBSDFData(bsdfData, metallic > 0.0, !HasFlag(surfaceData.materialFeatures, MATERIALFEATUREFLAGS_LIT_SPECULAR_COLOR));
 
     return bsdfData;
 }
