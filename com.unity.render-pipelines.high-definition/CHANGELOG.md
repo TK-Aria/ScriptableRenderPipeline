@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added basic distance fade for density volumes
 - Added decal master node for shader graph
 - Added HD unlit master node (Cross Pipeline one is name Unlit)
+- Added Debug lighting mode for validation of material albedo and metalness values
 
 ### Fixed
 - Fixed logic to disable FPTL with stereo rendering
