@@ -32,7 +32,11 @@ StructuredBuffer<LightVolumeData> _LightVolumeData : register(t2);
 StructuredBuffer<SFiniteLightBound> g_data : register( t3 );
 
 
+#if defined(SHADER_API_SWITCH)
+#define NR_THREADS          32
+#else
 #define NR_THREADS          64
+#endif
 
 // output buffer
 RWStructuredBuffer<uint> g_vLightList : register( u0 );     // don't support RWBuffer yet in unity

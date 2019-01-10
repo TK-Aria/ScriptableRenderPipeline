@@ -70,7 +70,11 @@ StructuredBuffer<uint> g_vBigTileLightList : register( t4 );        // don't sup
 #endif
 
 
+#if defined(SHADER_API_SWITCH)
+#define NR_THREADS          32
+#else
 #define NR_THREADS          64
+#endif
 
 RWStructuredBuffer<uint> g_vLayeredLightList : register( u0 );          // don't support RWBuffer yet in unity
 RWStructuredBuffer<uint> g_LayeredOffset : register( u1 );              // don't support RWBuffer yet in unity
