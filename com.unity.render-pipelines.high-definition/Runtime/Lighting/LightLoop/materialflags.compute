@@ -15,7 +15,11 @@
 #pragma only_renderers d3d11 ps4 xboxone vulkan metal switch
 
 #define USE_MATERIAL_FEATURE_FLAGS
+#if defined(SHADER_API_SWITCH)
+#define NR_THREADS  32
+#else
 #define NR_THREADS  64
+#endif
 
 CBUFFER_START(UnityMaterialFlags)
 uint2 g_viDimensions;
