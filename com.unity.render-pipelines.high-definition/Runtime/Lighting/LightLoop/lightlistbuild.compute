@@ -18,7 +18,7 @@
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightLoop.cs.hlsl"
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/LightingConvexHullUtils.hlsl"
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
 #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Lighting/LightLoop/SortingComputeUtils.hlsl"
 #endif
 
@@ -164,7 +164,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
         lightOffs = 0;
     }
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -199,8 +199,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
         InterlockedMax(ldsZMax, asuint(dpt_ma));
         InterlockedMin(ldsZMin, asuint(dpt_mi));
 
-
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) /* && !defined(SHADER_API_SWITCH)*/
         GroupMemoryBarrierWithGroupSync();
 #endif
     }
@@ -244,7 +243,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
     if(t<2) ldsDoesLightIntersect[t] = 0;
 #endif
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -272,7 +271,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
     if(t==0) ldsFeatureFlags=0;
 #endif
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -287,7 +286,7 @@ void LIGHTLISTGEN(uint threadID : SV_GroupIndex, uint3 u3GroupID : SV_GroupID)
     }
 
     // sort lights (gives a more efficient execution in both deferred and tiled forward lighting).
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
     SORTLIST(prunedList, nrLightsCombinedList, MAX_NR_COARSE_ENTRIES, t, NR_THREADS);
     //MERGESORTLIST(prunedList, coarseList, nrLightsCombinedList, t, NR_THREADS);
 #endif
@@ -350,7 +349,7 @@ int SphericalIntersectionTests(uint threadID, int iNrCoarseLights, float2 screen
     for(l=threadID; l<iNrCoarseLights; l+=NR_THREADS)
         prunedList[l]=coarseList[l];
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -375,7 +374,7 @@ int SphericalIntersectionTests(uint threadID, int iNrCoarseLights, float2 screen
         }
     }
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
     GroupMemoryBarrierWithGroupSync();
 #endif
 
@@ -501,7 +500,7 @@ void FinePruneLights(uint threadID, int iNrCoarseLights, uint2 viTilLL, float4 v
     InterlockedOr(ldsDoesLightIntersect[1], uLightsFlags[1]);
     if(t==0) ldsNrLightsFinal = 0;
 
-#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL)
+#if !defined(SHADER_API_XBOXONE) && !defined(SHADER_API_PSSL) && !defined(SHADER_API_SWITCH)
     GroupMemoryBarrierWithGroupSync();
 #endif
 
