@@ -21,12 +21,19 @@ NOTE: This [Node](Node.md) can only be used in the **Fragment** [Shader Stage](S
 | UV     | Input | Vector 4 | Screen Position | Normalized screen coordinates |
 | Out | Output      |    Vector 1 | None | Output value |
 
+## Depth Sampling modes
+| Name     | Description                        |
+|----------|------------------------------------|
+| Linear01 | linear depth value between 0 and 1 |
+| Raw      | raw depth value                    |
+| Eye      | depth converted to world space units |
+
 ## Generated Code Example
 
 The following example code represents one possible outcome of this node.
 
 ```
-void Unity_SceneDepth_float(float4 UV, out float Out)
+void Unity_SceneDepth_Raw_float(float4 UV, out float Out)
 {
     Out = SHADERGRAPH_SAMPLE_SCENE_DEPTH(UV);
 }
